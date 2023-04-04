@@ -1,0 +1,65 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block title %}
+    News
+{% endblock title %}
+
+{% block content %}
+   <h1>Все новости</h1>
+
+
+   <!-- Используем переданную из представления переменную time_now
+   и применяем к ней фильтр date. -->
+   <h3>{{ time_now|date:'d M Y' }}</h3>
+   <h3> Количество постов: {{news|length}} </h3>
+
+   <hr>
+   {% if news %}
+       <table>
+           <tr>
+               <td><b>Дата</b></td>
+               <td><b>Название</b></td>
+               <td><b>Описание</b></td>
+               <td><b>Категория</b></td>
+           </tr>
+
+           {% for post in news %}
+           <tr>
+               <td><i>{{ post.date }}</i></td>
+               <td><i>{{ post.name|truncatewords:10|censor }}</i></td>
+               <td>{{ post.description|truncatechars:20|censor }}</td>
+               <td><b>{{ post.category.name|censor }}</b></td>
+           </tr>
+           {% endfor %}
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+
+     {# Добавляем пагинацию на страницу #}
+
+   {# Информация о предыдущих страницах #}
+   {% if page_obj.has_previous %}
+       <a href="?{% url_replace page=1 %}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+{% endblock content %}
